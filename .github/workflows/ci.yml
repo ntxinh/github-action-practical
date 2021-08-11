@@ -10,11 +10,6 @@ on:
   repository_dispatch:
     types: [run-ci]
   workflow_dispatch:
-    inputs:
-      home:
-        description: 'location'
-        required: false
-        default: 'The Octoverse'
 
 env:
   SLACK_WEBHOOK_URL: ${{ secrets.DEV_SLACK_WEBHOOK_URL }}
