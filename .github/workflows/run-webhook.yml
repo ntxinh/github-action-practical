@@ -10,7 +10,6 @@ on:
   workflow_dispatch:
 
 env:
-  SLACK_WEBHOOK_URL: ${{ vars.SLACK_WEBHOOK_URL }}  # Store in GitHub Secrets
   AUTHOR_NAME: ${{ github.actor }}
   AUTHOR_ICON: "https://github.com/${{ github.actor }}.png"  # GitHub user avatar
   ACTION_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
@@ -28,6 +27,8 @@ jobs:
         run: sudo apt update && sudo apt install -y jq
 
       - name: Send Slack Notification
+        env:
+          SLACK_WEBHOOK_URL: ${{ vars.SLACK_WEBHOOK_URL }}
         continue-on-error: true
         run: |
           # Ensure the script is executable
@@ -46,6 +47,8 @@ jobs:
             "$ACTION_URL"
 
       - name: Send Discord Notification
+        env:
+          DISCORD_WEBHOOK_URL: ${{ vars.DISCORD_WEBHOOK_URL }}
         continue-on-error: true
         run: |
           # Ensure the script is executable
@@ -66,7 +69,8 @@ jobs:
       - name: Send Telegram Notification
         continue-on-error: true
         env:
-            TELEGRAM_CHAT_ID: ${{ vars.TELEGRAM_CHAT_ID }}
+          TELEGRAM_WEBHOOK_URL: ${{ vars.TELEGRAM_WEBHOOK_URL }}
+          TELEGRAM_CHAT_ID: ${{ vars.TELEGRAM_CHAT_ID }}
         run: |
           # Ensure the script is executable
           chmod +x scripts/telegram-webhook.sh
