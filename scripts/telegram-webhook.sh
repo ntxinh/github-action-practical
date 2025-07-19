@@ -13,7 +13,11 @@ actionUrl="$9"
 chatId="$10"
 
 # Escape special characters in commit message for jq
+authorName=$(echo "$authorName" | sed 's/"/\\"/g')
+actionUrl=$(echo "$actionUrl" | sed 's/"/\\"/g')
+branchSource=$(echo "$branchSource" | sed 's/"/\\"/g')
 commitMsg=$(echo "$commitMsg" | sed 's/"/\\"/g')
+commitId=$(echo "$commitId" | sed 's/"/\\"/g')
 
 # Create JSON payload using jq
 webhookJSON=$(jq -n \
