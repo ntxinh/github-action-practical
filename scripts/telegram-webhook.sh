@@ -28,18 +28,29 @@ fi
 
 # Escape special characters for MarkdownV2
 # Telegram MarkdownV2 requires escaping: _ * [ ] ( ) ~ ` # + - = | { } . !
-commitMsg=$(echo "$commitMsg" | sed 's/[_*[\]()~`#+-=|{.}!]/\\&/g')
-branchSource=$(echo "$branchSource" | sed 's/[_*[\]()~`#+-=|{.}!]/\\&/g')
-commitId=$(echo "$commitId" | sed 's/[_*[\]()~`#+-=|{.}!]/\\&/g')
-authorName=$(echo "$authorName" | sed 's/[_*[\]()~`#+-=|{.}!]/\\&/g')
-actionUrl=$(echo "$actionUrl" | sed 's/[_*[\]()~`#+-=|{.}!]/\\&/g')
+escape_markdownv2() {
+  echo "$1" | sed 's/[_*[\]()~`#+-=|{.}!]/\\&/g'
+}
 
-# Also escape double quotes for JSON safety
+commitMsg=$(escape_markdownv2 "$commitMsg")
+branchSource=$(escape_markdownv2 "$branchSource")
+commitId=$(escape_markdownv2 "$commitId")
+authorName=$(escape_markdownv2 "$authorName")
+actionUrl=$(escape_markdownv2 "$actionUrl")
+
+# Escape double quotes for JSON safety
 commitMsg=$(echo "$commitMsg" | sed 's/"/\\"/g')
 branchSource=$(echo "$branchSource" | sed 's/"/\\"/g')
 commitId=$(echo "$commitId" | sed 's/"/\\"/g')
 authorName=$(echo "$authorName" | sed 's/"/\\"/g')
 actionUrl=$(echo "$actionUrl" | sed 's/"/\\"/g')
+
+# Debug: Print escaped inputs
+echo "Debug: Escaped commitMsg: $commitMsg"
+echo "Debug: Escaped branchSource: $branchSource"
+echo "Debug: Escaped commitId: $commitId"
+echo "Debug: Escaped authorName: $authorName"
+echo "Debug: Escaped actionUrl: $actionUrl"
 
 # Create JSON payload using jq
 webhookJSON=$(jq -n \
@@ -58,6 +69,9 @@ webhookJSON=$(jq -n \
   }')
 
 echo "Sending request to $webhookUrl $chatId"
+
+# Debug: Print JSON payload (avoid exposing sensitive data in production)
+echo "Debug: JSON payload: $webhookJSON"
 
 # Send POST request using curl
 curl -X POST \
