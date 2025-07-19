@@ -64,12 +64,12 @@ echo "Debug: Final actionUrl: $actionUrl_escaped"
 webhookJSON=$(jq -n \
   --arg title "$title" \
   --arg chatId "$chatId" \
-  --arg authorName "$authorName" \
+  --arg authorName "$authorName_escaped" \
   --arg authorIcon "$authorIcon" \
-  --arg branchSource "$branchSource" \
-  --arg commitId "$commitId" \
-  --arg commitMsg "$commitMsg" \
-  --arg actionUrl "$actionUrl" \
+  --arg branchSource "$branchSource_escaped" \
+  --arg commitId "$commitId_escaped" \
+  --arg commitMsg "$commitMsg_escaped" \
+  --arg actionUrl "$actionUrl_escaped" \
   '{
     chat_id: $chatId,
     text: "Author: \($authorName), Actions URL: \($actionUrl), Ref: \($branchSource), Msg: \($commitMsg), Commit: \($commitId)",
