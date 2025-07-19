@@ -82,8 +82,7 @@ jobs:
             "${{ github.event.head_commit.message }}" \
             "$TELEGRAM_WEBHOOK_URL" \
             "New Push to Repository" \
-            "16411130" \
+            "$TELEGRAM_CHAT_ID" \
             "$AUTHOR_NAME" \
             "$AUTHOR_ICON" \
-            "$ACTION_URL" \
-            "$TELEGRAM_CHAT_ID"
+            "$ACTION_URL"

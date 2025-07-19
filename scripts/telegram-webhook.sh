@@ -6,11 +6,11 @@ commitId="$2"
 commitMsg="$3"
 webhookUrl="$4"
 title="$5"
-color="$6"
+# color="$6"
+chatId="$6"
 authorName="$7"
 authorIcon="$8"
 actionUrl="$9"
-chatId="$10"
 
 # Validate inputs
 if [ -z "$webhookUrl" ]; then
@@ -44,14 +44,13 @@ actionUrl=$(echo "$actionUrl" | sed 's/"/\\"/g')
 # Create JSON payload using jq
 webhookJSON=$(jq -n \
   --arg title "$title" \
-  --arg color "$color" \
+  --arg chatId "$chatId" \
   --arg authorName "$authorName" \
   --arg authorIcon "$authorIcon" \
   --arg branchSource "$branchSource" \
   --arg commitId "$commitId" \
   --arg commitMsg "$commitMsg" \
   --arg actionUrl "$actionUrl" \
-  --arg chatId "$chatId" \
   '{
     chat_id: $chatId,
     text: "Author: \($authorName), Actions URL: \($actionUrl), Ref: \($branchSource), Msg: \($commitMsg), Commit: \($commitId)",
@@ -63,4 +62,5 @@ echo "Sending request to $webhookUrl $chatId"
 # Send POST request using curl
 curl -X POST \
   -H "Content-Type: application/json" \
-  -d "$webhookJSON"
+  -d "$webhookJSON" \
+  "$webhookUrl"
