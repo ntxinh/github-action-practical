@@ -12,23 +12,34 @@ authorIcon="$8"
 actionUrl="$9"
 chatId="$10"
 
-# Escape special characters in commit message for jq
-# authorName=$(echo "$authorName" | sed 's/"/\\"/g')
-# actionUrl=$(echo "$actionUrl" | sed 's/"/\\"/g')
-# branchSource=$(echo "$branchSource" | sed 's/"/\\"/g')
-# commitMsg=$(echo "$commitMsg" | sed 's/"/\\"/g')
-# commitId=$(echo "$commitId" | sed 's/"/\\"/g')
+# Validate inputs
+if [ -z "$webhookUrl" ]; then
+  echo "Error: webhookUrl is empty or not provided"
+  exit 1
+fi
+if [ -z "$chatId" ]; then
+  echo "Error: chatId is empty or not provided"
+  exit 1
+fi
+if [[ ! "$webhookUrl" =~ ^https?:// ]]; then
+  echo "Error: webhookUrl is malformed, must start with http:// or https://"
+  exit 1
+fi
 
-# Escape special characters in commit message for MarkdownV2
+# Escape special characters for MarkdownV2
 # Telegram MarkdownV2 requires escaping: _ * [ ] ( ) ~ ` # + - = | { } . !
 commitMsg=$(echo "$commitMsg" | sed 's/[_*[\]()~`#+-=|{.}!]/\\&/g')
+branchSource=$(echo "$branchSource" | sed 's/[_*[\]()~`#+-=|{.}!]/\\&/g')
+commitId=$(echo "$commitId" | sed 's/[_*[\]()~`#+-=|{.}!]/\\&/g')
+authorName=$(echo "$authorName" | sed 's/[_*[\]()~`#+-=|{.}!]/\\&/g')
+actionUrl=$(echo "$actionUrl" | sed 's/[_*[\]()~`#+-=|{.}!]/\\&/g')
 
 # Also escape double quotes for JSON safety
 commitMsg=$(echo "$commitMsg" | sed 's/"/\\"/g')
-
-# Escape branchSource and commitId for MarkdownV2 safety
-branchSource=$(echo "$branchSource" | sed 's/[_*[\]()~`#+-=|{.}!]/\\&/g')
-commitId=$(echo "$commitId" | sed 's/[_*[\]()~`#+-=|{.}!]/\\&/g')
+branchSource=$(echo "$branchSource" | sed 's/"/\\"/g')
+commitId=$(echo "$commitId" | sed 's/"/\\"/g')
+authorName=$(echo "$authorName" | sed 's/"/\\"/g')
+actionUrl=$(echo "$actionUrl" | sed 's/"/\\"/g')
 
 # Create JSON payload using jq
 webhookJSON=$(jq -n \
@@ -47,11 +58,9 @@ webhookJSON=$(jq -n \
     parse_mode: "MarkdownV2"
   }')
 
+echo "Sending request to $webhookUrl $chatId"
+
 # Send POST request using curl
-curl --fail -X POST \
+curl -X POST \
   -H "Content-Type: application/json" \
-  -d "$webhookJSON" \
-  "$webhookUrl" || {
-  echo "Error: curl failed to send request to $webhookUrl"
-  exit 1
-}
+  -d "$webhookJSON"
