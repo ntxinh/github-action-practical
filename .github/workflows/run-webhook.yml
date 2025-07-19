@@ -27,7 +27,8 @@ jobs:
       - name: Install jq
         run: sudo apt update && sudo apt install -y jq
 
-      - name: Send Webhook Notification
+      - name: Send Slack Notification
+        continue-on-error: true
         run: |
           # Ensure the script is executable
           chmod +x scripts/slack-webhook.sh
@@ -45,6 +46,7 @@ jobs:
             "$ACTION_URL"
 
       - name: Send Discord Notification
+        continue-on-error: true
         run: |
           # Ensure the script is executable
           chmod +x scripts/discord-webhook.sh
@@ -62,6 +64,7 @@ jobs:
             "$ACTION_URL"
 
       - name: Send Telegram Notification
+        continue-on-error: true
         env:
             TELEGRAM_CHAT_ID: ${{ vars.TELEGRAM_CHAT_ID }}
         run: |

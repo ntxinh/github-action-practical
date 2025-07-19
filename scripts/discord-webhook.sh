@@ -26,12 +26,12 @@ webhookJSON=$(jq -n \
   --arg actionUrl "$actionUrl" \
   '{
     username: $authorName,
-    avatar_url: $authorIcon
+    avatar_url: $authorIcon,
     embeds: [
         { description: $branchSource, color: $color },
         { description: $actionUrl, color: $color },
         { description: $commitId, color: $color },
-        { description: $commitMsg, color: $color },
+        { description: $commitMsg, color: $color }
     ]
   }')
 
