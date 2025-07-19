@@ -1,0 +1,82 @@
+name: Notify Webhook
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  SLACK_WEBHOOK_URL: ${{ vars.SLACK_WEBHOOK_URL }}  # Store in GitHub Secrets
+  AUTHOR_NAME: ${{ github.actor }}
+  AUTHOR_ICON: "https://github.com/${{ github.actor }}.png"  # GitHub user avatar
+  ACTION_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+jobs:
+  bash-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Install jq
+      - name: Install jq
+        run: sudo apt update && sudo apt install -y jq
+
+      - name: Send Webhook Notification
+        run: |
+          # Ensure the script is executable
+          chmod +x scripts/slack-webhook.sh
+
+          # Run the script with parameters
+          ./scripts/slack-webhook.sh \
+            "${{ github.ref_name }}" \
+            "${{ github.sha }}" \
+            "${{ github.event.head_commit.message }}" \
+            "$SLACK_WEBHOOK_URL" \
+            "New Push to Repository" \
+            "#36a64f" \
+            "$AUTHOR_NAME" \
+            "$AUTHOR_ICON" \
+            "$ACTION_URL"
+
+      - name: Send Discord Notification
+        run: |
+          # Ensure the script is executable
+          chmod +x scripts/discord-webhook.sh
+
+          # Run the script with parameters
+          ./scripts/discord-webhook.sh \
+            "${{ github.ref_name }}" \
+            "${{ github.sha }}" \
+            "${{ github.event.head_commit.message }}" \
+            "$DISCORD_WEBHOOK_URL" \
+            "New Push to Repository" \
+            "16411130" \
+            "$AUTHOR_NAME" \
+            "$AUTHOR_ICON" \
+            "$ACTION_URL"
+
+      - name: Send Telegram Notification
+        env:
+            TELEGRAM_CHAT_ID: ${{ vars.TELEGRAM_CHAT_ID }}
+        run: |
+          # Ensure the script is executable
+          chmod +x scripts/telegram-webhook.sh
+
+          # Run the script with parameters
+          ./scripts/telegram-webhook.sh \
+            "${{ github.ref_name }}" \
+            "${{ github.sha }}" \
+            "${{ github.event.head_commit.message }}" \
+            "$TELEGRAM_WEBHOOK_URL" \
+            "New Push to Repository" \
+            "16411130" \
+            "$AUTHOR_NAME" \
+            "$AUTHOR_ICON" \
+            "$ACTION_URL" \
+            "$TELEGRAM_CHAT_ID"
