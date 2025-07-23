@@ -26,6 +26,33 @@ jobs:
       - name: Install jq
         run: sudo apt update && sudo apt install -y jq
 
+      - name: Send Slack Notification 2
+        env:
+          SLACK_WEBHOOK_URL: ${{ vars.SLACK_WEBHOOK_URL }}
+        continue-on-error: true
+        run: |
+          # Copy script to a writable directory
+          cp ./scripts/slack-webhook.sh /tmp/slack-webhook.sh
+          chmod +x /tmp/slack-webhook.sh
+
+          # Verify script exists
+          if [ ! -f /tmp/slack-webhook.sh ]; then
+            echo "Error: Script /tmp/slack-webhook.sh not found"
+            exit 1
+          fi
+
+          # Run the script with parameters
+          /tmp/slack-webhook.sh \
+            "${{ github.ref_name }}" \
+            "${{ github.sha }}" \
+            "${{ github.event.head_commit.message }}" \
+            "$SLACK_WEBHOOK_URL" \
+            "New Push to Repository" \
+            "#36a64f" \
+            "$AUTHOR_NAME" \
+            "$AUTHOR_ICON" \
+            "$ACTION_URL"
+
       - name: Send Slack Notification
         env:
           SLACK_WEBHOOK_URL: ${{ vars.SLACK_WEBHOOK_URL }}
